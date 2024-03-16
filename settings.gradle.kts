@@ -21,4 +21,4 @@ dependencyResolutionManagement {
 
 rootProject.name = "ClockView"
 include(":app")
- 
+include(":clockview")
