@@ -2,6 +2,7 @@
 <resources>
     <declare-styleable name="ClockView">
         <attr name="baseColor" format="color"/>
+        <attr name="frameColor" format="color"/>
         <attr name="clockViewStyle" format="reference"/>
     </declare-styleable>
 </resources>
