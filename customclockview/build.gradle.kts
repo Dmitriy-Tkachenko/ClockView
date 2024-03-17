@@ -4,7 +4,7 @@ plugins {
 }
 
 android {
-    namespace = "ru.tk4dmitriy.clockview"
+    namespace = "ru.tk4dmitriy.customclockview"
     compileSdk = 34
 
     defaultConfig {
