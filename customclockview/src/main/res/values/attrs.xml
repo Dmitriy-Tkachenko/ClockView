@@ -5,6 +5,7 @@
         <attr name="frameColor" format="color"/>
         <attr name="secondHandColor" format="color"/>
         <attr name="minuteHandColor" format="color"/>
+        <attr name="hourHandColor" format="color"/>
         <attr name="clockViewStyle" format="reference"/>
     </declare-styleable>
 </resources>
