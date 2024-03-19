@@ -9,9 +9,11 @@ import android.os.Parcel
 import android.os.Parcelable
 import android.util.AttributeSet
 import android.view.View
+import android.view.accessibility.AccessibilityNodeInfo
 import androidx.core.content.ContextCompat
 import androidx.core.content.withStyledAttributes
 import java.util.Calendar
+import java.util.Locale
 import kotlin.math.cos
 import kotlin.math.sin
 
@@ -150,6 +152,8 @@ class ClockView @JvmOverloads constructor(
             )
         }
 
+        importantForAccessibility = IMPORTANT_FOR_ACCESSIBILITY_YES
+
         framePaint.apply { style = Paint.Style.STROKE }
         hourLabelsPaint.apply { typeface = Typeface.DEFAULT
             textAlign = Paint.Align.CENTER; letterSpacing = -0.16f; }
@@ -186,6 +190,7 @@ class ClockView @JvmOverloads constructor(
     }
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
+        super.onMeasure(widthMeasureSpec, heightMeasureSpec)
         val width = resolveSize(defWidth, widthMeasureSpec)
         val height = resolveSize(defHeight, heightMeasureSpec)
         setMeasuredDimension(width, height)
@@ -274,6 +279,14 @@ class ClockView @JvmOverloads constructor(
             additionalPartSecondHandPaint
         )
     }
+
+    override fun onInitializeAccessibilityNodeInfo(info: AccessibilityNodeInfo) {
+        super.onInitializeAccessibilityNodeInfo(info)
+        info.contentDescription = getCurrentTimeDescription()
+    }
+
+    private fun getCurrentTimeDescription() =
+        String.format(Locale.getDefault(), "%02d:%02d:%02d", currHour, currMinute, currSecond)
 
     override fun onSaveInstanceState(): Parcelable {
         return SavedState(super.onSaveInstanceState()).apply {
