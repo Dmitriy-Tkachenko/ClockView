@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/fragment_first"
+        android:icon="@drawable/one_page"
+        android:title="@string/full_size" />
+    <item
+        android:id="@+id/fragment_second"
+        android:icon="@drawable/two_page"
+        android:title="@string/default_size" />
+    <item
+        android:id="@+id/fragment_third"
+        android:icon="@drawable/three_page"
+        android:title="@string/variants" />
+</menu>

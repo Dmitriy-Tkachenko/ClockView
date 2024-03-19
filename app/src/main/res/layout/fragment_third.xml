@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <LinearLayout
+        android:id="@+id/grid_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <ru.tk4dmitriy.customclockview.ClockView
+            android:id="@+id/clock_view_one"
+            android:layout_width="150dp"
+            android:layout_height="150dp"
+            android:layout_gravity="center"
+            android:layout_margin="@dimen/margin"
+            app:secondHandColor="@color/red"/>
+
+        <ru.tk4dmitriy.customclockview.ClockView
+            android:id="@+id/clock_view_two"
+            android:layout_width="150dp"
+            android:layout_height="150dp"
+            android:layout_gravity="center"
+            android:layout_margin="@dimen/margin"/>
+
+        <ru.tk4dmitriy.customclockview.ClockView
+            android:id="@+id/clock_view_three"
+            android:layout_width="150dp"
+            android:layout_height="150dp"
+            android:layout_gravity="center"
+            android:layout_margin="@dimen/margin"/>
+
+        <ru.tk4dmitriy.customclockview.ClockView
+            android:id="@+id/clock_view_four"
+            android:layout_width="150dp"
+            android:layout_height="150dp"
+            android:layout_gravity="center"
+            android:layout_margin="@dimen/margin"/>
+
+    </LinearLayout>
+
+</ScrollView>

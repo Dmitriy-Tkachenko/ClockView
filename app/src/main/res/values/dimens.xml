@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- fragment_first -->
+    <dimen name="padding">20dp</dimen>
+    <!-- fragment_third -->
+    <dimen name="margin">6dp</dimen>
+</resources>
