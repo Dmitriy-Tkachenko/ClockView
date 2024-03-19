@@ -290,8 +290,6 @@ class ClockView @JvmOverloads constructor(
 
     override fun onSaveInstanceState(): Parcelable {
         return SavedState(super.onSaveInstanceState()).apply {
-            width = this@ClockView.width
-            height = this@ClockView.height
             baseColor = this@ClockView.baseColor
             frameColor = this@ClockView.frameColor
             secondHandColor = this@ClockView.secondHandColor
@@ -305,8 +303,6 @@ class ClockView @JvmOverloads constructor(
     override fun onRestoreInstanceState(state: Parcelable?) {
         if (state is SavedState) {
             super.onRestoreInstanceState(state.superState)
-            layoutParams.width = state.width
-            layoutParams.height = state.height
             frameColor = state.frameColor
             baseColor = state.baseColor
             frameColor = state.frameColor
@@ -315,15 +311,12 @@ class ClockView @JvmOverloads constructor(
             hourHandColor = state.hourHandColor
             clockMarkersColor = state.clockMarkersColor
             hourLabelsColor = state.hourLabelsColor
-            requestLayout()
         } else {
             super.onRestoreInstanceState(state)
         }
     }
 
     private class SavedState : BaseSavedState {
-        var width = 0
-        var height = 0
         var baseColor = 0
         var frameColor = 0
         var secondHandColor = 0
@@ -335,8 +328,6 @@ class ClockView @JvmOverloads constructor(
         constructor(superState: Parcelable?) : super(superState)
 
         constructor(parcel: Parcel) : super(parcel) {
-            width = parcel.readInt()
-            height = parcel.readInt()
             baseColor = parcel.readInt()
             frameColor = parcel.readInt()
             secondHandColor = parcel.readInt()
@@ -348,8 +339,6 @@ class ClockView @JvmOverloads constructor(
 
         override fun writeToParcel(out: Parcel, flags: Int) {
             super.writeToParcel(out, flags)
-            out.writeInt(width)
-            out.writeInt(height)
             out.writeInt(baseColor)
             out.writeInt(frameColor)
             out.writeInt(secondHandColor)
