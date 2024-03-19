@@ -9,6 +9,7 @@ import android.util.AttributeSet
 import android.view.View
 import androidx.core.content.ContextCompat
 import androidx.core.content.withStyledAttributes
+import java.util.Calendar
 import kotlin.math.cos
 import kotlin.math.sin
 
@@ -41,6 +42,8 @@ private const val SECOND_TO_MINUTE_ANGLE_RATIO = Math.PI / (30 * 60)
 private const val SECOND_TO_HOUR_ANGLE_RATIO = Math.PI / (30 * 60 * 12)
 private const val OFFSET_ANGLE = Math.PI / 2
 
+private const val INVALIDATE_PERIOD = 160L
+
 class ClockView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null
@@ -57,6 +60,11 @@ class ClockView @JvmOverloads constructor(
 
     private val defWidth: Int = resources.getDimension(R.dimen.defWidth).toInt()
     private val defHeight: Int = resources.getDimension(R.dimen.defHeight).toInt()
+
+    private val calendar: Calendar = Calendar.getInstance()
+    private var currSecond = 0
+    private var currMinute = 0
+    private var currHour = 0
 
     private var centerX = 0f
     private var centerY = 0f
@@ -140,9 +148,8 @@ class ClockView @JvmOverloads constructor(
         drawFrame(canvas = canvas)
         drawClockMarkers(canvas = canvas)
         drawHourLabels(canvas = canvas)
-        drawHourHand(canvas = canvas, second = 5400)
-        drawMinuteHand(canvas = canvas, second = 900)
-        drawSecondHand(canvas = canvas, second = 0)
+        drawClockHands(canvas = canvas)
+        postInvalidateDelayed(INVALIDATE_PERIOD)
     }
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
@@ -185,6 +192,17 @@ class ClockView @JvmOverloads constructor(
                 hourLabelsPaint
             )
         }
+    }
+
+    private fun drawClockHands(canvas: Canvas) {
+        calendar.timeInMillis = System.currentTimeMillis()
+        currHour = calendar.get(Calendar.HOUR_OF_DAY)
+        currHour = if (currHour > 12) currHour - 12 else currHour
+        currMinute = calendar.get(Calendar.MINUTE)
+        currSecond = calendar.get(Calendar.SECOND)
+        drawHourHand(canvas = canvas, second = (currHour * 60 + currMinute) * 60 + currSecond)
+        drawMinuteHand(canvas = canvas, second = currMinute * 60 + currSecond)
+        drawSecondHand(canvas = canvas, second = currSecond)
     }
 
     private fun drawHourHand(canvas: Canvas, second: Int) {
