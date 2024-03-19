@@ -5,6 +5,8 @@ import android.graphics.Canvas
 import android.graphics.Paint
 import android.graphics.Rect
 import android.graphics.Typeface
+import android.os.Parcel
+import android.os.Parcelable
 import android.util.AttributeSet
 import android.view.View
 import androidx.core.content.ContextCompat
@@ -73,12 +75,48 @@ class ClockView @JvmOverloads constructor(
     private var angle = 0f
 
     var baseColor = 0
+        set(value) {
+            basePaint.color = value
+            if (field != value && field != 0) invalidate()
+            field = value
+        }
     var frameColor = 0
+        set(value) {
+            framePaint.color = value
+            if (field != value && field != 0) invalidate()
+            field = value
+        }
     var secondHandColor = 0
+        set(value) {
+            mainPartSecondHandPaint.color = value
+            additionalPartSecondHandPaint.color = value
+            if (field != value && field != 0) invalidate()
+            field = value
+        }
     var minuteHandColor = 0
+        set(value) {
+            minuteHandPaint.color = value
+            if (field != value && field != 0) invalidate()
+            field = value
+        }
     var hourHandColor = 0
+        set(value) {
+            hourHandPaint.color = value
+            if (field != value && field != 0) invalidate()
+            field = value
+        }
     var clockMarkersColor = 0
+        set(value) {
+            clockMarkersPaint.color = value
+            if (field != value && field != 0) invalidate()
+            field = value
+        }
     var hourLabelsColor = 0
+        set(value) {
+            hourLabelsPaint.color = value
+            if (field != value && field != 0) invalidate()
+            field = value
+        }
 
     init {
         context.withStyledAttributes(attrs, R.styleable.ClockView, R.attr.clockViewStyle) {
@@ -112,14 +150,8 @@ class ClockView @JvmOverloads constructor(
             )
         }
 
-        basePaint.apply { color = baseColor }
-        framePaint.apply { color = frameColor; style = Paint.Style.STROKE }
-        mainPartSecondHandPaint.apply { color = secondHandColor }
-        additionalPartSecondHandPaint.apply { color = secondHandColor }
-        minuteHandPaint.apply { color = minuteHandColor }
-        hourHandPaint.apply { color = hourHandColor }
-        clockMarkersPaint.apply { color = clockMarkersColor }
-        hourLabelsPaint.apply { color = hourLabelsColor; typeface = Typeface.DEFAULT
+        framePaint.apply { style = Paint.Style.STROKE }
+        hourLabelsPaint.apply { typeface = Typeface.DEFAULT
             textAlign = Paint.Align.CENTER; letterSpacing = -0.16f; }
     }
 
@@ -144,6 +176,7 @@ class ClockView @JvmOverloads constructor(
     }
 
     override fun onDraw(canvas: Canvas) {
+        super.onDraw(canvas)
         drawBase(canvas = canvas)
         drawFrame(canvas = canvas)
         drawClockMarkers(canvas = canvas)
@@ -153,7 +186,6 @@ class ClockView @JvmOverloads constructor(
     }
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
-        super.onMeasure(widthMeasureSpec, heightMeasureSpec)
         val width = resolveSize(defWidth, widthMeasureSpec)
         val height = resolveSize(defHeight, heightMeasureSpec)
         setMeasuredDimension(width, height)
@@ -241,5 +273,82 @@ class ClockView @JvmOverloads constructor(
             centerY - sin(angle) * radius * MAIN_SHORT_PART_SECOND_HAND_TO_RADIUS_RATIO,
             additionalPartSecondHandPaint
         )
+    }
+
+    override fun onSaveInstanceState(): Parcelable {
+        return SavedState(super.onSaveInstanceState()).apply {
+            width = this@ClockView.width
+            height = this@ClockView.height
+            baseColor = this@ClockView.baseColor
+            frameColor = this@ClockView.frameColor
+            secondHandColor = this@ClockView.secondHandColor
+            minuteHandColor = this@ClockView.minuteHandColor
+            hourHandColor = this@ClockView.hourHandColor
+            clockMarkersColor = this@ClockView.clockMarkersColor
+            hourLabelsColor = this@ClockView.hourLabelsColor
+        }
+    }
+
+    override fun onRestoreInstanceState(state: Parcelable?) {
+        if (state is SavedState) {
+            super.onRestoreInstanceState(state.superState)
+            layoutParams.width = state.width
+            layoutParams.height = state.height
+            frameColor = state.frameColor
+            baseColor = state.baseColor
+            frameColor = state.frameColor
+            secondHandColor = state.secondHandColor
+            minuteHandColor = state.minuteHandColor
+            hourHandColor = state.hourHandColor
+            clockMarkersColor = state.clockMarkersColor
+            hourLabelsColor = state.hourLabelsColor
+            requestLayout()
+        } else {
+            super.onRestoreInstanceState(state)
+        }
+    }
+
+    private class SavedState : BaseSavedState {
+        var width = 0
+        var height = 0
+        var baseColor = 0
+        var frameColor = 0
+        var secondHandColor = 0
+        var minuteHandColor = 0
+        var hourHandColor = 0
+        var clockMarkersColor = 0
+        var hourLabelsColor = 0
+
+        constructor(superState: Parcelable?) : super(superState)
+
+        constructor(parcel: Parcel) : super(parcel) {
+            width = parcel.readInt()
+            height = parcel.readInt()
+            baseColor = parcel.readInt()
+            frameColor = parcel.readInt()
+            secondHandColor = parcel.readInt()
+            minuteHandColor = parcel.readInt()
+            hourHandColor = parcel.readInt()
+            clockMarkersColor = parcel.readInt()
+            hourLabelsColor = parcel.readInt()
+        }
+
+        override fun writeToParcel(out: Parcel, flags: Int) {
+            super.writeToParcel(out, flags)
+            out.writeInt(width)
+            out.writeInt(height)
+            out.writeInt(baseColor)
+            out.writeInt(frameColor)
+            out.writeInt(secondHandColor)
+            out.writeInt(minuteHandColor)
+            out.writeInt(hourHandColor)
+            out.writeInt(clockMarkersColor)
+            out.writeInt(hourLabelsColor)
+        }
+
+        companion object CREATOR : Parcelable.Creator<SavedState> {
+            override fun createFromParcel(parcel: Parcel): SavedState = SavedState(parcel)
+            override fun newArray(size: Int): Array<SavedState?> = arrayOfNulls(size)
+        }
     }
 }
