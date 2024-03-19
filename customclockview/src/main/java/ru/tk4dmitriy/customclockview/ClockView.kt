@@ -3,6 +3,8 @@ package ru.tk4dmitriy.customclockview
 import android.content.Context
 import android.graphics.Canvas
 import android.graphics.Paint
+import android.graphics.Rect
+import android.graphics.Typeface
 import android.util.AttributeSet
 import android.view.View
 import androidx.core.content.ContextCompat
@@ -28,7 +30,11 @@ private const val WIDTH_HOUR_HAND_TO_RADIUS_RATIO = 4.0f / 63.0f
 
 private const val RADIUS_NON_HOUR_MARKER_TO_RADIUS_RATIO = 3.0f / 315.0f
 private const val RADIUS_HOUR_MARKER_TO_RADIUS_RATIO = 4.0f / 315.0f
-private const val POSITION_TIME_MARKER_TO_RADIUS_RATIO = 52.0f / 63.0f
+private const val POS_CLOCK_MARKER_TO_RADIUS_RATIO = 52.0f / 63.0f
+
+private const val HOUR_LABEL_SIZE_TO_RADIUS_RATIO = 5.0f / 21.0f
+private const val HOR_POS_HOUR_LABEL_TO_RADIUS_RATIO = 44.0f / 63.0f
+private const val VERT_POS_HOUR_LABEL_TO_RADIUS_RATIO = 2.0f / 3.0f
 
 private const val SECOND_TO_ANGLE_RATIO = Math.PI / 30
 private const val SECOND_TO_MINUTE_ANGLE_RATIO = Math.PI / (30 * 60)
@@ -45,7 +51,9 @@ class ClockView @JvmOverloads constructor(
     private val additionalPartSecondHandPaint = Paint(Paint.ANTI_ALIAS_FLAG)
     private val minuteHandPaint = Paint(Paint.ANTI_ALIAS_FLAG)
     private val hourHandPaint = Paint(Paint.ANTI_ALIAS_FLAG)
-    private val timeMarkersPaint = Paint(Paint.ANTI_ALIAS_FLAG)
+    private val clockMarkersPaint = Paint(Paint.ANTI_ALIAS_FLAG)
+    private val hourLabelsPaint = Paint(Paint.ANTI_ALIAS_FLAG)
+    private val hourRect = Rect()
 
     private val defWidth: Int = resources.getDimension(R.dimen.defWidth).toInt()
     private val defHeight: Int = resources.getDimension(R.dimen.defHeight).toInt()
@@ -61,7 +69,8 @@ class ClockView @JvmOverloads constructor(
     var secondHandColor = 0
     var minuteHandColor = 0
     var hourHandColor = 0
-    var timeMarkersColor = 0
+    var clockMarkersColor = 0
+    var hourLabelsColor = 0
 
     init {
         context.withStyledAttributes(attrs, R.styleable.ClockView, R.attr.clockViewStyle) {
@@ -85,8 +94,12 @@ class ClockView @JvmOverloads constructor(
                 R.styleable.ClockView_hourHandColor,
                 ContextCompat.getColor(context, R.color.black)
             )
-            timeMarkersColor = getColor(
-                R.styleable.ClockView_timeMarkersColor,
+            clockMarkersColor = getColor(
+                R.styleable.ClockView_clockMarkersColor,
+                ContextCompat.getColor(context, R.color.black)
+            )
+            hourLabelsColor = getColor(
+                R.styleable.ClockView_hourLabelsColor,
                 ContextCompat.getColor(context, R.color.black)
             )
         }
@@ -97,7 +110,9 @@ class ClockView @JvmOverloads constructor(
         additionalPartSecondHandPaint.apply { color = secondHandColor }
         minuteHandPaint.apply { color = minuteHandColor }
         hourHandPaint.apply { color = hourHandColor }
-        timeMarkersPaint.apply { color = timeMarkersColor }
+        clockMarkersPaint.apply { color = clockMarkersColor }
+        hourLabelsPaint.apply { color = hourLabelsColor; typeface = Typeface.DEFAULT
+            textAlign = Paint.Align.CENTER; letterSpacing = -0.16f; }
     }
 
     override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
@@ -116,12 +131,15 @@ class ClockView @JvmOverloads constructor(
             radius * WIDTH_MINUTE_HAND_TO_RADIUS_RATIO
         hourHandPaint.strokeWidth =
             radius * WIDTH_HOUR_HAND_TO_RADIUS_RATIO
+
+        hourLabelsPaint.textSize = radius * HOUR_LABEL_SIZE_TO_RADIUS_RATIO
     }
 
     override fun onDraw(canvas: Canvas) {
         drawBase(canvas = canvas)
         drawFrame(canvas = canvas)
-        drawTimeMarkers(canvas = canvas)
+        drawClockMarkers(canvas = canvas)
+        drawHourLabels(canvas = canvas)
         drawHourHand(canvas = canvas, second = 5400)
         drawMinuteHand(canvas = canvas, second = 900)
         drawSecondHand(canvas = canvas, second = 0)
@@ -131,7 +149,6 @@ class ClockView @JvmOverloads constructor(
         super.onMeasure(widthMeasureSpec, heightMeasureSpec)
         val width = resolveSize(defWidth, widthMeasureSpec)
         val height = resolveSize(defHeight, heightMeasureSpec)
-
         setMeasuredDimension(width, height)
     }
 
@@ -143,15 +160,29 @@ class ClockView @JvmOverloads constructor(
         canvas.drawCircle(centerX, centerY, frameRadius, framePaint)
     }
 
-    private fun drawTimeMarkers(canvas: Canvas) {
+    private fun drawClockMarkers(canvas: Canvas) {
         for (second in 1.. 60) {
             angle = (second * SECOND_TO_ANGLE_RATIO - OFFSET_ANGLE).toFloat()
             canvas.drawCircle(
-                centerX + cos(angle) * radius * POSITION_TIME_MARKER_TO_RADIUS_RATIO,
-                centerY + sin(angle) * radius * POSITION_TIME_MARKER_TO_RADIUS_RATIO,
+                centerX + cos(angle) * radius * POS_CLOCK_MARKER_TO_RADIUS_RATIO,
+                centerY + sin(angle) * radius * POS_CLOCK_MARKER_TO_RADIUS_RATIO,
                 radius * if (second % 5 == 0) RADIUS_HOUR_MARKER_TO_RADIUS_RATIO
                 else RADIUS_NON_HOUR_MARKER_TO_RADIUS_RATIO,
-                timeMarkersPaint
+                clockMarkersPaint
+            )
+        }
+    }
+
+    private fun drawHourLabels(canvas: Canvas) {
+        for (hour in 1..12) {
+            angle = (hour * 5 * SECOND_TO_ANGLE_RATIO - OFFSET_ANGLE).toFloat()
+            hourLabelsPaint.getTextBounds("$hour", 0, "$hour".length, hourRect)
+            canvas.drawText(
+                "$hour",
+                centerX + cos(angle) * radius * HOR_POS_HOUR_LABEL_TO_RADIUS_RATIO,
+                centerY + (hourRect.height() / 2) + sin(angle) *
+                        radius * VERT_POS_HOUR_LABEL_TO_RADIUS_RATIO,
+                hourLabelsPaint
             )
         }
     }
